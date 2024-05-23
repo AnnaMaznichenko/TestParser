@@ -6,6 +6,7 @@ use App\Dto\SourceApiConfig;
 use App\Models\Income;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
 
 class IncomeParser
 {
@@ -18,6 +19,9 @@ class IncomeParser
 
     public function parse(): void
     {
+        DB::disableQueryLog();
+        $dispatcher = DB::connection()->getEventDispatcher();
+        DB::connection()->unsetEventDispatcher();
         $client = new Client(['base_uri' => "http://{$this->sourceApiConfig->getHost()}:{$this->sourceApiConfig->getPort()}/api/"]);
         $requiredYears = 10;//может 2?
         $limit = 500;
@@ -49,11 +53,13 @@ class IncomeParser
                 if ($totalPage === 0) {
                     $totalPage = ceil(($incomes->meta->total ?? 0) / $limit);
                 }
-                Income::insert($this->getIncomes($incomes->data ?? []));
+                Income::insert($this->extractIncomes($incomes->data ?? []));
             } while ($page++ < $totalPage);
         }
+        DB::enableQueryLog();
+        DB::connection()->setEventDispatcher($dispatcher);
     }
-    public function getIncomes(array $incomes): array
+    public function extractIncomes(array $incomes): array
     {
         $data = [];
         foreach ($incomes as $income) {
