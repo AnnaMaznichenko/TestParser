@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Services\IncomeParser;
+use App\Dto\SourceApiConfig;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
@@ -14,13 +14,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->when(IncomeParser::class)
+        $this->app->when(SourceApiConfig::class)
             ->needs('$host')
             ->giveConfig("app.source_api.host");
-        $this->app->when(IncomeParser::class)
+        $this->app->when(SourceApiConfig::class)
             ->needs('$port')
             ->giveConfig("app.source_api.port");
-        $this->app->when(IncomeParser::class)
+        $this->app->when(SourceApiConfig::class)
             ->needs('$key')
             ->giveConfig("app.source_api.key");
     }
