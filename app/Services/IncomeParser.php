@@ -10,9 +10,6 @@ use Illuminate\Support\Facades\DB;
 
 class IncomeParser
 {
-    /**
-     * @throws \Exception
-     */
     public function __construct(private SourceApiConfig $sourceApiConfig)
     {
     }
@@ -23,7 +20,7 @@ class IncomeParser
         $dispatcher = DB::connection()->getEventDispatcher();
         DB::connection()->unsetEventDispatcher();
         $client = new Client(['base_uri' => "http://{$this->sourceApiConfig->getHost()}:{$this->sourceApiConfig->getPort()}/api/"]);
-        $requiredYears = 10;//может 2?
+        $requiredYears = 10;
         $limit = 500;
         $year = (int)date("Y");
         $dateTo = date("Y-m-d");

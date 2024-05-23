@@ -9,6 +9,28 @@ class Stock extends Model
 {
     use HasFactory;
 
+    /**
+     * @property string
+     * @property string date
+     * @property string last_change_date
+     * @property string supplier_article
+     * @property string tech_size
+     * @property string barcode
+     * @property int quantity
+     * @property int is_supply
+     * @property int is_realization
+     * @property int quantity_full
+     * @property string warehouse_name
+     * @property int in_way_to_client
+     * @property int in_way_from_client
+     * @property int nm_id
+     * @property string subject
+     * @property string category
+     * @property string brand
+     * @property string sc_code
+     * @property int price
+     * @property int discount
+     */
     public $timestamps = false;
     protected $fillable = [
         "date",
