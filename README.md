@@ -14,12 +14,12 @@
 
 Доступы к БД:
 
-DB_CONNECTION=mysql
-DB_HOST=141.8.192.46
-DB_PORT=3306
-DB_DATABASE=a0987119_TestParser
-DB_USERNAME=a0987119_AnnaMaznichenko
-DB_PASSWORD=Czs1hkVE
+- DB_CONNECTION=mysql
+- DB_HOST=141.8.192.46
+- DB_PORT=3306
+- DB_DATABASE=a0987119_TestParser
+- DB_USERNAME=a0987119_AnnaMaznichenko
+- DB_PASSWORD=Czs1hkVE
 
 
 Поскольку неизвестны временные границы данных по сущностям income, order, sale, было сделано допущение и данные запрашиваются за последние 10 лет от текущей даты.
