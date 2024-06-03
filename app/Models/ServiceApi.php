@@ -13,6 +13,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  */
 class ServiceApi extends Model
 {
+    protected $fillable = [
+        "host",
+        "port",
+    ];
     public function accounts(): BelongsToMany
     {
         return $this->belongsToMany(

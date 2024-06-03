@@ -14,4 +14,12 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
  */
 class Token extends Pivot
 {
+    protected $fillable = [
+        "token",
+        "token_type_id",
+        "account_id",
+        "service_api_id",
+    ];
+
+    protected $table = "tokens";
 }

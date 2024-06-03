@@ -8,16 +8,15 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('service_apis', function (Blueprint $table) {
+        Schema::create('token_types', function (Blueprint $table) {
             $table->id();
-            $table->string("host")->default("");
-            $table->unsignedInteger("port")->default(0);
+            $table->string("name")->unique();
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('service_apis');
+        Schema::dropIfExists('token_types');
     }
 };
