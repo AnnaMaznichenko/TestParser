@@ -11,12 +11,12 @@ class CompanyCreator
     {
         $attributes = ["name" => $name];
         $validator = Validator::make($attributes, [
-            "name" => "required|unique:App\Models\Company,name",
+            "name" => "required|unique:" . Company::class . ",name",
         ]);
         $result = new CreateResult();
 
         if ($validator->fails()) {
-            $result->error = $validator->messages()->messages();
+            $result->errors = $validator->messages()->messages();
 
             return $result;
         }

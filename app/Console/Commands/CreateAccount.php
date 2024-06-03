@@ -20,8 +20,8 @@ class CreateAccount extends Command
     {
         $result = $this->accountCreator->create($this->argument("name"), $this->argument("company_id"));
 
-        if (!empty($result->error)) {
-            $this->error("The account has not been created. Error: " . json_encode($result->error));
+        if (!empty($result->errors)) {
+            $this->error("The account has not been created. Error: " . json_encode($result->errors));
             return 1;
         }
 

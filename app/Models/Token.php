@@ -16,8 +16,10 @@ class Token extends Pivot
 {
     protected $fillable = [
         "token",
-        "type_id",
+        "token_type_id",
         "account_id",
         "service_api_id",
     ];
+
+    protected $table = "tokens";
 }

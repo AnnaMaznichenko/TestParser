@@ -20,8 +20,8 @@ class CreateServiceApi extends Command
     {
         $result = $this->serviceApiCreator->create($this->argument("host"), $this->argument("port"));
 
-        if (!empty($result->error)) {
-            $this->error("The service api has not been created. Error: " . json_encode($result->error));
+        if (!empty($result->errors)) {
+            $this->error("The service api has not been created. Error: " . json_encode($result->errors));
             return 1;
         }
 

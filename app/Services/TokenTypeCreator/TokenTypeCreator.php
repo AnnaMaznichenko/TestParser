@@ -12,12 +12,12 @@ class TokenTypeCreator
     {
         $attributes = ["name" => $name];
         $validator = Validator::make($attributes, [
-            "name" => "required|unique:App\Models\TokenType,name",
+            "name" => "required|unique:" . TokenType::class . ",name",
         ]);
         $result = new CreateResult();
 
         if ($validator->fails()) {
-            $result->error = $validator->messages()->messages();
+            $result->errors = $validator->messages()->messages();
 
             return $result;
         }

@@ -20,8 +20,8 @@ class CreateTokenType extends Command
     {
         $result = $this->tokenTypeCreator->create($this->argument("name"));
 
-        if (!empty($result->error)) {
-            $this->error("The token type has not been created. Error: " . json_encode($result->error));
+        if (!empty($result->errors)) {
+            $this->error("The token type has not been created. Error: " . json_encode($result->errors));
             return 1;
         }
 

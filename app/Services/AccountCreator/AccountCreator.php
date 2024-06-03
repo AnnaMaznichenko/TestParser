@@ -3,6 +3,7 @@
 namespace App\Services\AccountCreator;
 
 use App\Models\Account;
+use App\Models\Company;
 use App\Services\AccountCreator\CreateResult;
 use Illuminate\Support\Facades\Validator;
 
@@ -15,13 +16,13 @@ class AccountCreator
             "company_id" => $company_id,
         ];
         $validator = Validator::make($attributes, [
-            "name" => "required|unique:App\Models\Company,name",
-            "company_id" => "exists:App\Models\Company,id",
+            "name" => "required|unique:" . Account::class . ",name",
+            "company_id" => "exists:" . Company::class . ",id",
         ]);
         $result = new CreateResult();
 
         if ($validator->fails()) {
-            $result->error = $validator->messages()->messages();
+            $result->errors = $validator->messages()->messages();
 
             return $result;
         }

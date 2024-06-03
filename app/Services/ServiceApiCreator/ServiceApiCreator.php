@@ -20,7 +20,7 @@ class ServiceApiCreator
         $result = new CreateResult();
 
         if ($validator->fails()) {
-            $result->error = $validator->messages()->messages();
+            $result->errors = $validator->messages()->messages();
 
             return $result;
         }

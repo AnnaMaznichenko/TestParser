@@ -1,11 +1,9 @@
 <?php
 
-namespace App\Services\CompanyCreator;
+namespace App\Services\TokenCreator;
 
 class CreateResult
 {
-    public int $id;
-
     /**
      * @var string[]
      */
