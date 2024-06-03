@@ -13,6 +13,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  */
 class Account extends Model
 {
+    protected $fillable = [
+        "cabinet_id",
+        "name",
+    ];
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class, "company_id");
