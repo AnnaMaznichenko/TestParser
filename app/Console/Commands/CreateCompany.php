@@ -20,10 +20,10 @@ class CreateCompany extends Command
     {
         $result = $this->companyCreator->create($this->argument("name"));
         if (!empty($result->error)) {
-            $this->error('The company has not been created');
+            $this->error("The account has not been created. Error: " . json_encode($result->error));
             return 1;
         }
-        $this->info("The company was created, id {$result->id}");
+        $this->info("The company was created, id: {$result->id}");
         return 0;
     }
 }

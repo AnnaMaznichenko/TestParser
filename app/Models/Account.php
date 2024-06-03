@@ -8,13 +8,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 /**
  * @property int $id
- * @property int $cabinet_id
+ * @property int $company_id
  * @property string $name
  */
 class Account extends Model
 {
     protected $fillable = [
-        "cabinet_id",
+        "company_id",
         "name",
     ];
     public function company(): BelongsTo
