@@ -16,6 +16,11 @@ return new class extends Migration
                 ->on("companies")
                 ->onDelete("cascade")
                 ->onUpdate("cascade");
+            $table->foreignId("token_id")
+                ->references("id")
+                ->on("tokens")
+                ->onDelete("cascade")
+                ->onUpdate("cascade");
             $table->timestamps();
         });
     }

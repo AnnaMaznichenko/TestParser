@@ -7,7 +7,7 @@ use Illuminate\Console\Command;
 
 class CreateAccount extends Command
 {
-    protected $signature = 'app:create-account {name} {company_id}';
+    protected $signature = 'app:create-account {name} {companyId} {tokenId}';
 
     protected $description = 'Create account';
 
@@ -18,7 +18,11 @@ class CreateAccount extends Command
 
     public function handle()
     {
-        $result = $this->accountCreator->create($this->argument("name"), $this->argument("company_id"));
+        $result = $this->accountCreator->create(
+            $this->argument("name"),
+            $this->argument("companyId"),
+            $this->argument("tokenId"),
+        );
 
         if (!empty($result->errors)) {
             $this->error("The account has not been created. Error: " . json_encode($result->errors));

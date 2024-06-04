@@ -2,20 +2,22 @@
 
 namespace App\Services\ServiceApiCreator;
 
+use App\Models\Company;
 use App\Models\ServiceApi;
+use App\Models\TokenType;
 use Illuminate\Support\Facades\Validator;
 
 class ServiceApiCreator
 {
-    public function create(string $host, int $port): CreateResult
+    public function create(string $name, int $tokenTypeId): CreateResult
     {
         $attributes = [
-            "host" => $host,
-            "port" => $port,
+            "name" => $name,
+            "token_type_id" => $tokenTypeId,
         ];
         $validator = Validator::make($attributes, [
-            "host" => "required",
-            "port" => "numeric|min:0|max:65535",
+            "name" => "required|unique:" . ServiceApi::class . ",name",
+            "token_type_id" => "exists:" . TokenType::class . ",id",
         ]);
         $result = new CreateResult();
 

@@ -10,8 +10,12 @@ return new class extends Migration
     {
         Schema::create('service_apis', function (Blueprint $table) {
             $table->id();
-            $table->string("host")->default("");
-            $table->unsignedInteger("port")->default(0);
+            $table->string("name")->unique();
+            $table->foreignId("token_type_id")
+                ->references("id")
+                ->on("token_types")
+                ->onDelete("cascade")
+                ->onUpdate("cascade");
             $table->timestamps();
         });
     }

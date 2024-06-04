@@ -7,7 +7,7 @@ use Illuminate\Console\Command;
 
 class CreateServiceApi extends Command
 {
-    protected $signature = 'app:create-serviceApi {host} {port}';
+    protected $signature = 'app:create-serviceApi {name} {tokenTypeId}';
 
     protected $description = 'Create service api';
 
@@ -18,7 +18,7 @@ class CreateServiceApi extends Command
 
     public function handle(): int
     {
-        $result = $this->serviceApiCreator->create($this->argument("host"), $this->argument("port"));
+        $result = $this->serviceApiCreator->create($this->argument("name"), $this->argument("tokenTypeId"));
 
         if (!empty($result->errors)) {
             $this->error("The service api has not been created. Error: " . json_encode($result->errors));
