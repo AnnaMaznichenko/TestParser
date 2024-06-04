@@ -6,29 +6,29 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+
 /**
  * @property int $id
- * @property int $company_id
  * @property string $name
+ * @property int $company_id
+ * @property int $token_id
  */
 class Account extends Model
 {
     protected $fillable = [
-        "company_id",
         "name",
+        "company_id",
+        "token_id",
     ];
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class, "company_id");
     }
 
-    public function serviceApis(): BelongsToMany
+    public function token(): HasOne
     {
-        return $this->belongsToMany(
-            ServiceApi::class,
-            "tokens",
-            "account_id",
-            "service_api_id"
-        );
+        return $this->hasOne(Token::class, "token_id");
     }
 }

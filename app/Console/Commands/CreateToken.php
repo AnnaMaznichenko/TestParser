@@ -8,7 +8,7 @@ use Illuminate\Console\Command;
 
 class CreateToken extends Command
 {
-    protected $signature = 'app:create-token {token} {tokenTypeId} {accountId} {serviceApiId}';
+    protected $signature = 'app:create-token {token} {tokenTypeId} {serviceApiId}';
 
     protected $description = 'Create token';
 
@@ -21,7 +21,6 @@ class CreateToken extends Command
         $result = $this->tokenCreator->create(
             $this->argument("token"),
             $this->argument("tokenTypeId"),
-            $this->argument("accountId"),
             $this->argument("serviceApiId"),
         );
 
@@ -30,7 +29,7 @@ class CreateToken extends Command
             return 1;
         }
 
-        $this->info("The token was created");
+        $this->info("The token was created, id: {$result->id}");
 
         return 0;
     }
