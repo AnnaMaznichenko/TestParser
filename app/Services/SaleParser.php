@@ -4,8 +4,11 @@ namespace App\Services;
 
 use App\Dto\SourceApiConfig;
 use App\Models\Sale;
+use App\Models\Token;
 use GuzzleHttp\Client;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class SaleParser
 {
@@ -13,53 +16,67 @@ class SaleParser
     {
     }
 
-    public function parse(): void
+    public function parse(int $accountId): void
     {
+        $token = Token::whereHas("account", function (Builder $query) use ($accountId) {
+            $query->where("id", "=", $accountId);
+        })->first();
+
+        if ($token === null) {
+            throw new \Exception("No token found for this account");
+        }
+
+        Log::info("Let's start parsing sale for accountId: {$accountId}");
         DB::disableQueryLog();
         $dispatcher = DB::connection()->getEventDispatcher();
         DB::connection()->unsetEventDispatcher();
         $client = new Client(['base_uri' => "http://{$this->sourceApiConfig->getHost()}:{$this->sourceApiConfig->getPort()}/api/"]);
-        $requiredYears = 10;
         $limit = 500;
-        $year = (int)date("Y");
         $dateTo = date("Y-m-d");
-        $dateFrom = "{$year}-01-01";
-        for ($i = 0; $i < $requiredYears; $i++) {
-            if ($i !== 0) {
-                $dateTo = ($year - $i + 1) . "-01-01";
-                $dateFrom = ($year - $i) . "-01-01";
-            }
-            $page = 1;
-            $totalPage = 0;
-            do {
-                if ($page !== 0) {
-                    usleep(500000);
-                }
-                $response = $client->request('GET', 'sales', [
-                    'query' => [
-                        'dateFrom' => $dateFrom,
-                        'dateTo' => $dateTo,
-                        'page' => $page,
-                        'key' => $this->sourceApiConfig->getKey(),
-                        'limit' => $limit,
-                    ]
-                ]);
-                if ($response->getStatusCode() !== 200) {
-                    throw new \Exception("response status is not ok");
-                }
-                $body = $response->getBody();
-                $sales = json_decode($body->getContents());
-                if ($totalPage === 0) {
-                    $totalPage = ceil(($sales->meta->total ?? 0) / $limit);
-                }
-                Sale::insert($this->extractSales($sales->data ?? []));
-            } while ($page++ < $totalPage);
+        $dateFrom = "2023-01-01";
+
+        if (Sale::where("account_id", "=", $accountId)->exists()) {
+            $dateFrom = $dateTo;
+            Log::info("Deleting sale for the current date");
+            Sale::where("account_id", "=", $accountId)->where("date", "=", $dateFrom)->delete();
+            Log::info("Parsing sale for the current date");
+        } else {
+            Log::info("Parsing sale for the period from 2023-01-01 to the current date");
         }
+
+        $page = 1;
+        $totalPage = 0;
+        do {
+            if ($page !== 0) {
+                usleep(500000);
+            }
+            $response = $client->request('GET', 'sales', [
+                'query' => [
+                    'dateFrom' => $dateFrom,
+                    'dateTo' => $dateTo,
+                    'page' => $page,
+                    'key' => $token->token,
+                    'limit' => $limit,
+                ]
+            ]);
+            if ($response->getStatusCode() !== 200) {
+                throw new \Exception("response status is not ok");
+            }
+            $body = $response->getBody();
+            $sales = json_decode($body->getContents());
+            if ($totalPage === 0) {
+                $totalPage = ceil(($sales->meta->total ?? 0) / $limit);
+            }
+            Sale::insert($this->extractSales($sales->data ?? [], $accountId));
+            Log::info("Part of the data was saved successfully");
+        } while ($page++ < $totalPage);
+
+        Log::info("Parsing sale completed");
         DB::enableQueryLog();
         DB::connection()->setEventDispatcher($dispatcher);
     }
 
-    public function extractSales(array $sales): array
+    public function extractSales(array $sales, int $accountId): array
     {
         $data = [];
         foreach ($sales as $sale) {
@@ -91,6 +108,7 @@ class SaleParser
                 "category" => $sale->category,
                 "brand" => $sale->brand,
                 "is_storno" => $sale->is_storno,
+                "account_id" => $accountId,
             ];
         }
 

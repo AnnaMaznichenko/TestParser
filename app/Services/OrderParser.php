@@ -4,8 +4,11 @@ namespace App\Services;
 
 use App\Dto\SourceApiConfig;
 use App\Models\Order;
+use App\Models\Token;
 use GuzzleHttp\Client;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class OrderParser
 {
@@ -13,53 +16,67 @@ class OrderParser
     {
     }
 
-    public function parse(): void
+    public function parse(int $accountId): void
     {
+        $token = Token::whereHas("account", function (Builder $query) use ($accountId) {
+            $query->where("id", "=", $accountId);
+        })->first();
+
+        if ($token === null) {
+            throw new \Exception("No token found for this account");
+        }
+
+        Log::info("Let's start parsing order for accountId: {$accountId}");
         DB::disableQueryLog();
         $dispatcher = DB::connection()->getEventDispatcher();
         DB::connection()->unsetEventDispatcher();
         $client = new Client(['base_uri' => "http://{$this->sourceApiConfig->getHost()}:{$this->sourceApiConfig->getPort()}/api/"]);
-        $requiredYears = 10;
         $limit = 500;
-        $year = date("Y");
         $dateTo = date("Y-m-d");
-        $dateFrom = "{$year}-01-01";
-        for ($i = 0; $i < $requiredYears; $i++) {
-            if ($i !== 0) {
-                $dateTo = ($year - $i + 1) . "-01-01";
-                $dateFrom = ($year - $i) . "-01-01";
-            }
-            $page = 1;
-            $totalPage = 0;
-            do {
-                if ($page !== 0) {
-                    usleep(500000);
-                }
-                $response = $client->request('GET', 'orders', [
-                    'query' => [
-                        'dateFrom' => $dateFrom,
-                        'dateTo' => $dateTo,
-                        'page' => $page,
-                        'key' => $this->sourceApiConfig->getKey(),
-                        'limit' => $limit,
-                    ]
-                ]);
-                if ($response->getStatusCode() !== 200) {
-                    throw new \Exception("response status is not ok");
-                }
-                $body = $response->getBody();
-                $orders = json_decode($body->getContents());
-                if ($totalPage === 0) {
-                    $totalPage = ceil(($orders->meta->total ?? 0) / $limit);
-                }
-                Order::insert($this->extractOrders($orders->data ?? []));
-            } while ($page++ < $totalPage);
+        $dateFrom = "2023-01-01";
+
+        if (Order::where("account_id", "=", $accountId)->exists()) {
+            $dateFrom = $dateTo;
+            Log::info("Deleting order for the current date");
+            Order::where("account_id", "=", $accountId)->where("date", ">", "{$dateFrom} 00:00:00")->delete();
+            Log::info("Parsing order for the current date");
+        } else {
+            Log::info("Parsing order for the period from 2023-01-01 to the current date");
         }
+
+        $page = 1;
+        $totalPage = 0;
+        do {
+            if ($page !== 0) {
+                usleep(500000);
+            }
+            $response = $client->request('GET', 'orders', [
+                'query' => [
+                    'dateFrom' => $dateFrom,
+                    'dateTo' => $dateTo,
+                    'page' => $page,
+                    'key' => $token->token,
+                    'limit' => $limit,
+                ]
+            ]);
+            if ($response->getStatusCode() !== 200) {
+                throw new \Exception("response status is not ok");
+            }
+            $body = $response->getBody();
+            $orders = json_decode($body->getContents());
+            if ($totalPage === 0) {
+                $totalPage = ceil(($orders->meta->total ?? 0) / $limit);
+            }
+            Order::insert($this->extractOrders($orders->data ?? [], $accountId));
+            Log::info("Part of the data was saved successfully");
+        } while ($page++ < $totalPage);
+
+        Log::info("Parsing order completed");
         DB::enableQueryLog();
         DB::connection()->setEventDispatcher($dispatcher);
     }
 
-    public function extractOrders(array $orders): array
+    public function extractOrders(array $orders, int $accountId): array
     {
         $data = [];
         foreach ($orders as $order) {
@@ -82,6 +99,7 @@ class OrderParser
                 "brand" => $order->brand,
                 "is_cancel" => $order->is_cancel,
                 "cancel_dt" => $order->cancel_dt,
+                "account_id" => $accountId,
             ];
         }
 
