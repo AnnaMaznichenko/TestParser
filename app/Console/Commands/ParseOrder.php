@@ -12,7 +12,7 @@ class ParseOrder extends Command
      *
      * @var string
      */
-    protected $signature = 'app:parse-order';
+    protected $signature = 'app:parse-order {accountId}';
 
     /**
      * The console command description.
@@ -32,7 +32,7 @@ class ParseOrder extends Command
     public function handle(): int
     {
         try {
-            $this->orderParser->parse();
+            $this->orderParser->parse($this->argument("accountId"));
         } catch (\Exception $e) {
             $this->error($e->getMessage());
             return 1;

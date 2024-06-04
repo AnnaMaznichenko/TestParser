@@ -12,7 +12,7 @@ class ParseSale extends Command
      *
      * @var string
      */
-    protected $signature = 'app:parse-sale';
+    protected $signature = 'app:parse-sale {accountId}';
 
     /**
      * The console command description.
@@ -32,7 +32,7 @@ class ParseSale extends Command
     public function handle(): int
     {
         try {
-            $this->saleParser->parse();
+            $this->saleParser->parse($this->argument("accountId"));
         } catch (\Exception $e) {
             $this->error($e->getMessage());
             return 1;

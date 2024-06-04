@@ -12,7 +12,7 @@ class ParseStock extends Command
      *
      * @var string
      */
-    protected $signature = 'app:parse-stock';
+    protected $signature = 'app:parse-stock {accountId}';
 
     /**
      * The console command description.
@@ -32,7 +32,7 @@ class ParseStock extends Command
     public function handle(): int
     {
         try {
-            $this->stockParser->parse();
+            $this->stockParser->parse($this->argument("accountId"));
         } catch (\Exception $e) {
             $this->error($e->getMessage());
             return 1;

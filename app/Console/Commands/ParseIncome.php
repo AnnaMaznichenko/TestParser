@@ -10,18 +10,8 @@ use Illuminate\Support\Facades\Log;
 
 class ParseIncome extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'app:parse-income';
+    protected $signature = 'app:parse-income {accountId}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Parse income';
 
     public function __construct(private IncomeParser $incomeParser)
@@ -29,13 +19,10 @@ class ParseIncome extends Command
         parent::__construct();
     }
 
-    /**
-     * Execute the console command.
-     */
     public function handle(): int
     {
         try {
-            $this->incomeParser->parse();
+            $this->incomeParser->parse($this->argument("accountId"));
         } catch (\Exception $e) {
             $this->error($e->getMessage());
             return 1;
