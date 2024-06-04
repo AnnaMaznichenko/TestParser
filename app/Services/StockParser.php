@@ -9,6 +9,7 @@ use App\Providers\AppServiceProvider;
 use GuzzleHttp\Client;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class StockParser
 {
@@ -26,6 +27,7 @@ class StockParser
             throw new \Exception("No token found for this account");
         }
 
+        Log::info("Let's start parsing stock for accountId: {$accountId}");
         DB::disableQueryLog();
         $dispatcher = DB::connection()->getEventDispatcher();
         DB::connection()->unsetEventDispatcher();
@@ -36,7 +38,11 @@ class StockParser
         $totalPage = 0;
 
         if (Stock::where("account_id", "=", $accountId)->exists()) {
+            Log::info("Deleting stock for the current date");
             Stock::where("account_id", "=", $accountId)->where("date", "=", $dateFrom)->delete();
+            Log::info("Parsing stock for the current date");
+        } else {
+            Log::info("Parsing stock for the period from 2023-01-01 to the current date");
         }
 
         do {
@@ -60,7 +66,10 @@ class StockParser
                 $totalPage = ceil(($stocks->meta->total ?? 0) / $limit);
             }
             Stock::insert($this->extractStock($stocks->data ?? [], $accountId));
+            Log::info("Part of the data was saved successfully");
         } while ($page++ < $totalPage);
+
+        Log::info("Parsing stock completed");
         DB::enableQueryLog();
         DB::connection()->setEventDispatcher($dispatcher);
     }

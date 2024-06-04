@@ -26,8 +26,7 @@ class IncomeParser
             throw new \Exception("No token found for this account");
         }
 
-        Log::info("Let's start parsing income for accauntId: {$accountId}");
-
+        Log::info("Let's start parsing income for accountId: {$accountId}");
         DB::disableQueryLog();
         $dispatcher = DB::connection()->getEventDispatcher();
         DB::connection()->unsetEventDispatcher();
@@ -38,7 +37,11 @@ class IncomeParser
 
         if (Income::where("account_id", "=", $accountId)->exists()) {
             $dateFrom = $dateTo;
+            Log::info("Deleting income for the current date");
             Income::where("account_id", "=", $accountId)->where("date", "=", $dateFrom)->delete();
+            Log::info("Parsing income for the current date");
+        } else {
+            Log::info("Parsing income for the period from 2023-01-01 to the current date");
         }
 
         $page = 1;
@@ -66,8 +69,10 @@ class IncomeParser
             }
 
             Income::insert($this->extractIncomes($incomes->data ?? [], $accountId));
+            Log::info("Part of the data was saved successfully");
         } while ($page++ < $totalPage);
 
+        Log::info("Parsing income completed");
         DB::enableQueryLog();
         DB::connection()->setEventDispatcher($dispatcher);
     }

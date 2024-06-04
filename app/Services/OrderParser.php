@@ -8,6 +8,7 @@ use App\Models\Token;
 use GuzzleHttp\Client;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class OrderParser
 {
@@ -25,6 +26,7 @@ class OrderParser
             throw new \Exception("No token found for this account");
         }
 
+        Log::info("Let's start parsing order for accountId: {$accountId}");
         DB::disableQueryLog();
         $dispatcher = DB::connection()->getEventDispatcher();
         DB::connection()->unsetEventDispatcher();
@@ -35,7 +37,11 @@ class OrderParser
 
         if (Order::where("account_id", "=", $accountId)->exists()) {
             $dateFrom = $dateTo;
+            Log::info("Deleting order for the current date");
             Order::where("account_id", "=", $accountId)->where("date", ">", "{$dateFrom} 00:00:00")->delete();
+            Log::info("Parsing order for the current date");
+        } else {
+            Log::info("Parsing order for the period from 2023-01-01 to the current date");
         }
 
         $page = 1;
@@ -62,8 +68,10 @@ class OrderParser
                 $totalPage = ceil(($orders->meta->total ?? 0) / $limit);
             }
             Order::insert($this->extractOrders($orders->data ?? [], $accountId));
+            Log::info("Part of the data was saved successfully");
         } while ($page++ < $totalPage);
 
+        Log::info("Parsing order completed");
         DB::enableQueryLog();
         DB::connection()->setEventDispatcher($dispatcher);
     }

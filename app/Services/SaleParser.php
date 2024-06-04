@@ -8,6 +8,7 @@ use App\Models\Token;
 use GuzzleHttp\Client;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class SaleParser
 {
@@ -25,6 +26,7 @@ class SaleParser
             throw new \Exception("No token found for this account");
         }
 
+        Log::info("Let's start parsing sale for accountId: {$accountId}");
         DB::disableQueryLog();
         $dispatcher = DB::connection()->getEventDispatcher();
         DB::connection()->unsetEventDispatcher();
@@ -35,7 +37,11 @@ class SaleParser
 
         if (Sale::where("account_id", "=", $accountId)->exists()) {
             $dateFrom = $dateTo;
+            Log::info("Deleting sale for the current date");
             Sale::where("account_id", "=", $accountId)->where("date", "=", $dateFrom)->delete();
+            Log::info("Parsing sale for the current date");
+        } else {
+            Log::info("Parsing sale for the period from 2023-01-01 to the current date");
         }
 
         $page = 1;
@@ -62,8 +68,10 @@ class SaleParser
                 $totalPage = ceil(($sales->meta->total ?? 0) / $limit);
             }
             Sale::insert($this->extractSales($sales->data ?? [], $accountId));
+            Log::info("Part of the data was saved successfully");
         } while ($page++ < $totalPage);
 
+        Log::info("Parsing sale completed");
         DB::enableQueryLog();
         DB::connection()->setEventDispatcher($dispatcher);
     }
