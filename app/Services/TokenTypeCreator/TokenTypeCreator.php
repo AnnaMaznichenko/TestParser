@@ -3,7 +3,6 @@
 namespace App\Services\TokenTypeCreator;
 
 use App\Models\TokenType;
-use App\Services\TokenTypeCreator\CreateResult;
 use Illuminate\Support\Facades\Validator;
 
 class TokenTypeCreator

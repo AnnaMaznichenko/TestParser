@@ -5,7 +5,6 @@ namespace App\Services\AccountCreator;
 use App\Models\Account;
 use App\Models\Company;
 use App\Models\Token;
-use App\Services\AccountCreator\CreateResult;
 use Illuminate\Support\Facades\Validator;
 
 class AccountCreator

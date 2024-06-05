@@ -4,9 +4,6 @@ namespace App\Console\Commands;
 
 use App\Services\IncomeParser;
 use Illuminate\Console\Command;
-use GuzzleHttp\Client;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Log;
 
 class ParseIncome extends Command
 {
