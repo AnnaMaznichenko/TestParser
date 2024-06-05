@@ -2,7 +2,6 @@
 
 namespace App\Services\ServiceApiCreator;
 
-use App\Models\Company;
 use App\Models\ServiceApi;
 use App\Models\TokenType;
 use Illuminate\Support\Facades\Validator;

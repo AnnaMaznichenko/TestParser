@@ -7,18 +7,8 @@ use Illuminate\Console\Command;
 
 class ParseSale extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'app:parse-sale {accountId}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Parse sale';
 
     public function __construct(private SaleParser $saleParser)
@@ -26,9 +16,6 @@ class ParseSale extends Command
         parent::__construct();
     }
 
-    /**
-     * Execute the console command.
-     */
     public function handle(): int
     {
         try {

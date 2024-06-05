@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Dto\SourceApiConfig;
 use App\Models\Stock;
 use App\Models\Token;
-use App\Providers\AppServiceProvider;
 use GuzzleHttp\Client;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
