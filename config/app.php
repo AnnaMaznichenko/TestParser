@@ -126,6 +126,5 @@ return [
     'source_api' => [
         'host' => env('APP_SOURCE_API_HOST'),
         'port' => env('APP_SOURCE_API_PORT'),
-        'key' => env('APP_SOURCE_API_KEY'),
     ]
 ];

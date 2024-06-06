@@ -20,9 +20,6 @@ class AppServiceProvider extends ServiceProvider
         $this->app->when(SourceApiConfig::class)
             ->needs('$port')
             ->giveConfig("app.source_api.port");
-        $this->app->when(SourceApiConfig::class)
-            ->needs('$key')
-            ->giveConfig("app.source_api.key");
     }
 
     /**
