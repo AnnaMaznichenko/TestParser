@@ -15,6 +15,7 @@ fi
 
 chmod -R ugo+rw /.composer
 
+composer install
 php artisan migrate
 
 if [ $# -gt 0 ]; then
